@@ -2,6 +2,7 @@
 
 ## Estrcutura de los archivos
 
+```
 Sistema de Gestión de Reservas/
 ├── SOAP_service/
 │   ├── app/
@@ -23,6 +24,7 @@ Sistema de Gestión de Reservas/
 │   │   ├── init_inventory_db.sql
 │   ├── Dockerfile
 ├── docker-compose.yml
+```
 
 ## Instrucciones de uso
 
