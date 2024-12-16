@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  postgres_soap:
+    image: postgres:15
+    container_name: postgres_soap
+    environment:
+      POSTGRES_USER: soap_user
+      POSTGRES_PASSWORD: soap_password
+      POSTGRES_DB: soap_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_soap_data:/var/lib/postgresql/data
+      - ./SOAP_service/init-scripts:/docker-entrypoint-initdb.d
+
+  soap_service:
+    build:
+      context: ./SOAP_service
+    container_name: SOAP_service
+    environment:
+      DATABASE_URL: postgresql+psycopg2://soap_user:soap_password@postgres_soap:5432/soap_db
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres_soap
+
+  postgres_rest:
+    image: postgres:15
+    container_name: postgres_rest
+    environment:
+      POSTGRES_USER: rest_user
+      POSTGRES_PASSWORD: rest_password
+      POSTGRES_DB: rest_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_rest_data:/var/lib/postgresql/data
+      - ./Rest_service/init-scripts:/docker-entrypoint-initdb.d
+
+  rest_service:
+    build:
+      context: ./Rest_service
+    container_name: Rest_service
+    environment:
+      DATABASE_URL: postgresql+psycopg2://rest_user:rest_password@postgres_rest:5432/rest_db
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres_rest
+
+  postgres_inventory:
+    image: postgres:15
+    container_name: postgres_inventory
+    environment:
+      POSTGRES_USER: inventory_user
+      POSTGRES_PASSWORD: inventory_password
+      POSTGRES_DB: inventory_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_inventory_data:/var/lib/postgresql/data
+      - ./Microservicio/init-scripts:/docker-entrypoint-initdb.d
+
+  inventory_service:
+    build:
+      context: ./Microservicio
+    container_name: Microservicio
+    environment:
+      DATABASE_URL: postgresql+psycopg2://inventory_user:inventory_password@postgres_inventory:5432/inventory_db
+    ports:
+      - "5001:5001"
+    depends_on:
+      - postgres_inventory
+
+volumes:
+  postgres_soap_data:
+  postgres_rest_data:
+  postgres_inventory_data:
